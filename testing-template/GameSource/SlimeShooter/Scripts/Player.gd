@@ -115,9 +115,14 @@ func _physics_process(delta):
 		
 		var collision = move_and_collide(moveDirection * Speed * delta)
 		
-		if collision && collision.collider.get_node('character').is_visible():
-	
-			hitByEnemy(collision.collider)
+		
+		if collision:
+			
+			var character = collision.collider.get_node('character')
+			if character == null:
+				var monkey = 1
+			elif character.is_visible():
+				hitByEnemy(collision.collider)
 	
 	
 	if moveDirection.x == 0 && moveDirection.y == 0:

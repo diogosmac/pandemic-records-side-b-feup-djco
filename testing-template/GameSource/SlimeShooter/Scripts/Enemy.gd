@@ -34,7 +34,12 @@ func _ready():
 func _physics_process(delta):
 
 	# warning-ignore:return_value_discarded
-	move_and_collide(angle * Speed * delta)
+	var enemy_wall_collision = move_and_collide(angle * Speed * delta)
+	
+	if enemy_wall_collision:
+		print(enemy_wall_collision)
+		angle = angle - deg2rad(180)
+		enemy_wall_collision = move_and_collide(angle * Speed * delta)
 
 
 func missileHit():
