@@ -2,14 +2,17 @@ extends KinematicBody2D
 
 export(int) var Speed = 400
 export(PackedScene) var MissileScene
+export(PackedScene) var ShotgunBlastScene
 export(float) var MissileInterval = 0.3
+export(float) var ShotgunInterval = 1.0
 export(NodePath) var Barrel
 
 export(int) var RespawnInterval = 1
 var respawnTimer
 
 var moveDirection
-var firingTimer
+var missileTimer
+var shotgunTimer
 var fireFrom
 
 var mousePosition
@@ -31,7 +34,8 @@ func _ready():
 	
 	moveDirection = Vector2(0, 0)
 	
-	firingTimer = Global.oneShotTimer(MissileInterval, self, self, "onFiringTimerStopped")
+	missileTimer = Global.oneShotTimer(MissileInterval, self, self, "onFiringTimerStopped")
+	shotgunTimer = Global.oneShotTimer(ShotgunInterval, self, self, "onFiringTimerStopped")	
 	
 	fireFrom = $player_anim/waist/weapon/fireFrom
 	
@@ -107,10 +111,13 @@ func _physics_process(delta):
 		else:
 			moveDirection.y = 0
 		
-		# Fire weapon
-		if Input.is_action_pressed("fire"):
-			
-			firePressed()
+		# Fire left weapon
+		if Input.is_action_pressed("left_fire"):
+			leftFirePressed()
+		
+		# Fire right weapon
+		elif Input.is_action_pressed("right_fire"):
+			rightFirePressed()
 		
 		
 		var collision = move_and_collide(moveDirection * Speed * delta)
@@ -130,41 +137,58 @@ func _physics_process(delta):
 	elif (not $player_anim/Anim_Walk.get_current_animation() == "walk"):
 		$player_anim/Anim_Walk.play("walk")
 
+func leftFirePressed():
+	firePressed(false)
 
-func firePressed():
-	
+func rightFirePressed():
+	firePressed(true)
+
+func firePressed(shotgun):
+
 	if canFire:
-	
-		fireMissile()
-		
+
+		fireMissile(shotgun)
+
+
+		var timer = shotgunTimer if shotgun else missileTimer
 		# Start the firing timer
-		firingTimer.start()
-	
+		timer.start()
+
 		# Turn off the ability to fire until the firing interval time runs out
 		canFire = false
 
 
-func fireMissile():
+func fireMissile(shotgun):
 	
 	# slight variation of volume so it doesn't get too rhythmic
-	
 	randomize()
-	var randomVolume = rand_range(-2, 0)
+	var randomVolume;
+	if (shotgun):
+		randomVolume = rand_range(0, 2)
+	else:
+		randomVolume = rand_range(-2, 0)
 	
 	fireSound.set_volume_db(randomVolume)
 	
 	fireSound.play()
 	
-	missile = MissileScene.instance()
-	
-	missile.position = fireFrom.get_global_position()
-	
-	missile.rotation = $aim.get_rotation()
-	
-	missile.add_to_group("missiles")
-	
-	get_tree().get_root().add_child(missile)
+	if (shotgun):
+		shootShotgun()
+	else:
+		shootMissile()
 
+func shootShotgun():
+	for angle in [-35, -17.5, 0, 17.5, 35]:
+		shoot(ShotgunBlastScene.instance(), deg2rad(angle))
+
+func shootMissile():
+	shoot(MissileScene.instance(), 0)
+
+func shoot(bullet, angle):
+	bullet.position = fireFrom.get_global_position()
+	bullet.rotation = $aim.get_rotation() + angle
+	bullet.add_to_group("missiles")
+	get_tree().get_root().add_child(bullet)
 
 func onFiringTimerStopped():
 	
