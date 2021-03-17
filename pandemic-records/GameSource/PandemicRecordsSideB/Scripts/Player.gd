@@ -3,23 +3,25 @@ extends KinematicBody2D
 export(int) var Speed = 400
 export(PackedScene) var MissileScene
 export(PackedScene) var ShotgunBlastScene
+export(NodePath) var Barrel
+
 export(float) var MissileInterval = 0.3
 export(float) var ShotgunInterval = 1.0
-export(NodePath) var Barrel
+export(float) var PowerUpDuration = 10.0
+export(float) var QuickMissileInt = 0.15
+export(float) var QuickShotgunInt = 0.5
 
 export(int) var RespawnInterval = 1
 var respawnTimer
 
-#############
-# QUESTIONS
-#############
-# Intervals específicos para o power up ou altera-se os valores?
-# 
-#############
-
 var moveDirection
 var missileTimer
 var shotgunTimer
+var slowMissileTimer
+var slowShotgunTimer
+var quickMissileTimer
+var quickShotgunTimer
+var quickFireTimer
 var fireFrom
 
 var mousePosition
@@ -38,11 +40,18 @@ var tookHitSound
 
 
 func _ready():
-	
 	moveDirection = Vector2(0, 0)
 	
-	missileTimer = Global.oneShotTimer(MissileInterval, self, self, "onFiringTimerStopped")
-	shotgunTimer = Global.oneShotTimer(ShotgunInterval, self, self, "onFiringTimerStopped")
+	slowMissileTimer = Global.oneShotTimer(MissileInterval, self, self, "onFiringTimerStopped")
+	slowShotgunTimer = Global.oneShotTimer(ShotgunInterval, self, self, "onFiringTimerStopped")
+	quickMissileTimer = Global.oneShotTimer(QuickMissileInt, self, self, "onFiringTimerStopped")
+	quickShotgunTimer = Global.oneShotTimer(QuickShotgunInt, self, self, "onFiringTimerStopped")
+	
+	missileTimer = slowMissileTimer
+	shotgunTimer = slowShotgunTimer
+	
+	respawnTimer = Global.oneShotTimer(RespawnInterval, self, self, "respawnPlayer")
+	quickFireTimer = Global.oneShotTimer(PowerUpDuration, self, self, "normalFire")
 	
 	fireFrom = $player_anim/waist/weapon/fireFrom
 	
@@ -53,19 +62,15 @@ func _ready():
 
 
 func _physics_process(delta):
-	
-
-	# This code takes the angle the mouse is aiming at and converts it to a number that
-	# can represent a time in the player animation to jump to in order to
-	# make the little dude look like he's pointing the rifle in the right direction
+	# This code takes the angle the mouse is aiming at and converts it to a 
+	# number that can represent a time in the player animation to jump to in
+	# order to make the little dude look like he's pointing the rifle in the
+	# right direction
 	
 	# 0 is aiming to the right
 	# 90 is aiming straight down - 0.0
 	# 180 is aiming to the left - 0.3 in animation
 	# 270 is aiming straight up - 0.6
-	
-	# > 90 && <= 270 is left facing
-	# <= 90 && > 270 is right facing
 	
 	var rotation_degrees = fposmod($aim.rotation_degrees, 360)
 	
@@ -85,11 +90,9 @@ func _physics_process(delta):
 	# aiming left
 	if mousePosition.x < aimPosition.x:
 		$player_anim/Anim_Aim.set_current_animation('aiming_left')
-		
 	# aiming right
 	else:
 		$player_anim/Anim_Aim.set_current_animation('aiming_right')
-	
 	
 	var rotation_to_anim_time = (rotation_degrees - 0) * animation_split_into_degrees
 	
@@ -98,51 +101,50 @@ func _physics_process(delta):
 	$player_anim/Anim_Aim.seek(rotation_to_anim_time)
 	
 	if canMove:
-	
 		# Move and collide
 		if Input.is_action_pressed("left"):
 			moveDirection.x = -1
-	
 		elif Input.is_action_pressed("right"):
 			moveDirection.x = 1
-			
 		else:
 			moveDirection.x = 0
-	
 		if Input.is_action_pressed("up"):
 			moveDirection.y = -1
-			
 		elif Input.is_action_pressed("down"):
 			moveDirection.y = 1
-			
 		else:
 			moveDirection.y = 0
 		
 		# Fire left weapon
 		if Input.is_action_pressed("left_fire"):
 			leftFirePressed()
-		
+			
 		# Fire right weapon
 		elif Input.is_action_pressed("right_fire"):
 			rightFirePressed()
 		
+		# drop nuke (test only)
+		if Input.is_action_pressed("nuke"):
+			nuke()
+		
+		if Input.is_action_pressed("quickfire"):
+			quickFire()
 		
 		var collision = move_and_collide(moveDirection * Speed * delta)
-		
-		
 		if collision:
-			
 			var character = collision.collider.get_node('character')
-			if character == null:
-				var monkey = 1
-			elif character.is_visible():
+#			if character == null:
+#				var monkey = 1
+#			elif character.is_visible():
+#				hitByEnemy(collision.collider)
+			if (character != null) and (character.is_visible()):
 				hitByEnemy(collision.collider)
-	
 	
 	if moveDirection.x == 0 && moveDirection.y == 0:
 		$player_anim/Anim_Walk.play("rest")
 	elif (not $player_anim/Anim_Walk.get_current_animation() == "walk"):
 		$player_anim/Anim_Walk.play("walk")
+
 
 func leftFirePressed():
 	firePressed(false)
@@ -150,23 +152,18 @@ func leftFirePressed():
 func rightFirePressed():
 	firePressed(true)
 
+
 func firePressed(shotgun):
-
 	if canFire:
-
 		fireMissile(shotgun)
-
-
 		var timer = shotgunTimer if shotgun else missileTimer
 		# Start the firing timer
 		timer.start()
-
 		# Turn off the ability to fire until the firing interval time runs out
 		canFire = false
 
 
 func fireMissile(shotgun):
-	
 	# slight variation of volume so it doesn't get too rhythmic
 	randomize()
 	var randomVolume;
@@ -176,7 +173,6 @@ func fireMissile(shotgun):
 		randomVolume = rand_range(-2, 0)
 	
 	fireSound.set_volume_db(randomVolume)
-	
 	fireSound.play()
 	
 	if (shotgun):
@@ -184,12 +180,16 @@ func fireMissile(shotgun):
 	else:
 		shootMissile()
 
+
 func shootShotgun():
+	# 70 degrees cone in aim direction
 	for angle in [-35, -17.5, 0, 17.5, 35]:
 		shoot(ShotgunBlastScene.instance(), deg2rad(angle))
 
+
 func shootMissile():
 	shoot(MissileScene.instance(), 0)
+
 
 func shoot(bullet, angle):
 	bullet.position = fireFrom.get_global_position()
@@ -197,42 +197,44 @@ func shoot(bullet, angle):
 	bullet.add_to_group("missiles")
 	get_tree().get_root().add_child(bullet)
 
+
+func nuke():
+	var treeRoot = get_tree().get_root()
+	for node in treeRoot.get_children():
+		print(node)
+
+func quickFire():
+	missileTimer = quickMissileTimer
+	shotgunTimer = quickShotgunTimer
+	quickFireTimer.start()
+
+func normalFire():
+	missileTimer = slowMissileTimer
+	shotgunTimer = slowShotgunTimer
+
 func onFiringTimerStopped():
-	
 	# Set canFire back to true so the next round can be shot
 	canFire = true
 
 
 func hitByEnemy(enemy):
-	
 	tookHitSound.play()
-	
 	canMove = false
-	
 	enemy.queue_free()
 	
 	$explosion.set_emitting(true)
 	$player_anim.visible = false
 	
 	var playerCollision = get_node("CollisionShape2D")
-	
 	playerCollision.disabled = true
-	
 	playerSpawner.PlayerLives -= 1
-	
 	Global.hudLives.set_text(str(playerSpawner.PlayerLives))
 	
 	if playerSpawner.PlayerLives > 0:
-	
-		respawnTimer = Global.oneShotTimer(RespawnInterval, self, self, "respawnPlayer")
-	
 		respawnTimer.start()
-	
 	else:
-	
 		for missile in get_tree().get_nodes_in_group('missiles'):
 			missile.queue_free()
-		
 		playerSpawner.playerDied()
 
 

@@ -7,13 +7,12 @@ var score = 0
 var hudScore
 var hudLives
 
+var player
+
 func _ready():
-	
 	root = get_tree().get_root()
 
-
 func oneShotTimer(time, called_from_node, add_as_child_of, callback):
-	
 	var timer = Timer.new()
 	timer.set_one_shot(true)
 	timer.connect("timeout", called_from_node, callback)
@@ -25,9 +24,7 @@ func oneShotTimer(time, called_from_node, add_as_child_of, callback):
 	
 	return timer
 
-
 func repeatingTimer(time, called_from_node, add_as_child_of, callback):
-	
 	var timer = Timer.new()
 	timer.set_one_shot(false)
 	timer.connect("timeout", called_from_node, callback)
@@ -35,7 +32,6 @@ func repeatingTimer(time, called_from_node, add_as_child_of, callback):
 	add_as_child_of.add_child(timer)
 	
 	return timer
-
 
 func _process(_delta):
 	if Input.is_action_pressed("exit"):

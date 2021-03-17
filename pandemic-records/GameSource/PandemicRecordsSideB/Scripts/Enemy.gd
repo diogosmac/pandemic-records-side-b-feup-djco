@@ -1,56 +1,46 @@
 extends KinematicBody2D
 
-export(Array) var levelSpeeds = [150, 250, 350]
+export(String, "standard", "british", "dormant") var variantType = "standard"
+var variantIndexes = {
+	"standard": 0,
+	"british": 1,
+	"dormant": 2,
+}
+var variantSpeeds = [200, 200, 150]
+var variantScores = [ 25,  50,  10]
 
 var spawnedBy
+var direction
 
-var maxEnemyLevel = 3
-
+var Variant
 var Speed
-
-var angle
-
-var enemyLevel = 1
+var Score
 
 var visibilityNotifier
 
-var speedIndex
 
 func _ready():
-	
 	visibilityNotifier = VisibilityNotifier2D.new()
-	# increase the size of the visibility notifier size otherwise
-	# the asteroid will disappear before it's fully off screen
 	visibilityNotifier.set_rect(Rect2(-100, -100, 200, 200))
 	add_child(visibilityNotifier)
-	
 	visibilityNotifier.connect("screen_exited", self, "onScreenExit")
-	
-	speedIndex = enemyLevel - 1
-	
-	Speed = levelSpeeds[speedIndex]
-
+	Variant = variantIndexes[variantType]
+	Speed = variantSpeeds[Variant]
+	Score = variantScores[Variant]
 
 func _physics_process(delta):
-
-	# warning-ignore:return_value_discarded
-	var enemy_wall_collision = move_and_collide(angle * Speed * delta)
-	
+	var enemy_wall_collision = move_and_collide(direction * Speed * delta)
 	if enemy_wall_collision:
-		print(enemy_wall_collision)
-		angle = angle - deg2rad(180)
-		enemy_wall_collision = move_and_collide(angle * Speed * delta)
+		direction.x = -direction.x
+		enemy_wall_collision = move_and_collide(direction * Speed * delta)
 
 
 func missileHit():
-	
-	# Not sure why, but this line didn't work to disable collision
-#	$CollisionPolygon2D.disabled = true
 	# This line did work to disable collision
 	$CollisionPolygon2D.set_deferred("disabled", true)
 	$character.set_visible(false)
 	
-	# slightly vary the volume of the sound played when missile hits enemy so it doens't do your head in
+	# slightly vary the volume of the sound played when missile hits enemy
 	randomize()
 	var randomVolume = rand_range(-2, 0)
 	
@@ -58,7 +48,7 @@ func missileHit():
 	$hitSound.set_volume_db(randomVolume)
 	$hitSound.play()
 	
-	Global.score += enemyLevel * 10
+	Global.score += Score
 	
 	Global.hudScore.set_text(str(Global.score))
 	

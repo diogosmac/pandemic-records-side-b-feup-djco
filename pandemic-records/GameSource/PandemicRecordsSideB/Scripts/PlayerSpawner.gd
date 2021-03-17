@@ -16,29 +16,21 @@ var playerSprite
 var playerWeapon
 
 func _on_Play_Button_pressed():
-	
 	PlayerLives = PlayerStartingLives
-	
 	startGame()
 
-
 func startGame():
-	
 	spawnPlayer(false)
-	
 	Global.hudLives.set_text(str(PlayerLives))
 
-
 func spawnPlayer(isRespawn):
-	
 	player = PlayerScene.instance()
-	
+	Global.player = player
 	player.playerSpawner = self
 	
 	add_child(player)
 	
 	if isRespawn:
-	
 		invincibleTimer = Global.oneShotTimer(InvincibleTime, self, player, "onInvincibleTimerStopped")
 		
 		playerCollision = player.get_node("CollisionShape2D")
@@ -48,21 +40,16 @@ func spawnPlayer(isRespawn):
 		playerSprite.set_modulate(Color(1, 1, 1, 0.25))
 		
 		invincibleTimer.start()
-	
+		
 		player.canMove = true
 		player.canFire = false
-	
 	else:
-		
 		player.canMove = true
 
 
 func playerDied():
-	
 	player.queue_free()
-	
 	emit_signal('you_died')
-
 
 func onInvincibleTimerStopped():
 	

@@ -11,12 +11,16 @@ export(int) var increaseSpawnRateEvery = 10
 export(float) var increaseSpawnsBy = 1.1
 
 var EnemyScenes = [
-	"res://Gameplay/Enemy1.tscn",
-	"res://Gameplay/Enemy2.tscn",
-	"res://Gameplay/Enemy3.tscn"
+	"res://Gameplay/Enemies/EnemyStandard.tscn",
+	"res://Gameplay/Enemies/EnemyDormant.tscn",
+	"res://Gameplay/Enemies/EnemyBritish.tscn"
 ]
 
-var maxEnemyLevel = 3
+var EnemyVariants = [
+	"standard",
+	"dormant",
+	"british"
+]
 
 var enemiesToSpawn
 
@@ -48,6 +52,7 @@ func _on_PlayButton_pressed():
 
 func _on_PlayerSpawner_you_died():
 	clearEnemies()
+	Global.player = null
 
 
 func clearEnemies():
@@ -68,7 +73,7 @@ func spawnEnemy():
 	spawnTimer.start()
 
 	rng.randomize()
-	var enemyType = rng.randi_range(0, 2)
+	var enemyType = rng.randi_range(0, EnemyScenes.size() - 1)
 	spawnEnemyType(enemyType, Direction)
 
 
@@ -94,6 +99,7 @@ func spawnEnemyType(type, direction):
 			randomMax = 270
 
 	enemy = enemyScene.instance()
+	enemy.variantType = EnemyVariants[type]
 	enemy.position = enemySpawnLocation
 	enemy.add_to_group("enemies")
 
@@ -103,7 +109,7 @@ func spawnEnemyType(type, direction):
 	if randomAngle >= 90 && randomAngle <= 270:
 		enemy.apply_scale(Vector2(-1,1))
 
-	enemy.angle = Vector2( cos(randomAngle), sin(randomAngle) )
+	enemy.direction = Vector2( cos(randomAngle), sin(randomAngle) )
 	enemy.spawnedBy = self
 
 	get_parent().add_child(enemy)
