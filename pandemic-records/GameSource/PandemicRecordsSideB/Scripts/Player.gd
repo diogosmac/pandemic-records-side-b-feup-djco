@@ -10,6 +10,13 @@ export(NodePath) var Barrel
 export(int) var RespawnInterval = 1
 var respawnTimer
 
+#############
+# QUESTIONS
+#############
+# Intervals específicos para o power up ou altera-se os valores?
+# 
+#############
+
 var moveDirection
 var missileTimer
 var shotgunTimer
@@ -35,7 +42,7 @@ func _ready():
 	moveDirection = Vector2(0, 0)
 	
 	missileTimer = Global.oneShotTimer(MissileInterval, self, self, "onFiringTimerStopped")
-	shotgunTimer = Global.oneShotTimer(ShotgunInterval, self, self, "onFiringTimerStopped")	
+	shotgunTimer = Global.oneShotTimer(ShotgunInterval, self, self, "onFiringTimerStopped")
 	
 	fireFrom = $player_anim/waist/weapon/fireFrom
 	

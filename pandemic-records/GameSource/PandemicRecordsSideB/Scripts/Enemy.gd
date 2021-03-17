@@ -62,10 +62,6 @@ func missileHit():
 	
 	Global.hudScore.set_text(str(Global.score))
 	
-	if enemyLevel < spawnedBy.maxEnemyLevel:
-	
-		spawnedBy.spawnEnemies(enemyLevel + 1, self, "any")
-		
 	# wait a second for the sound to play then destroy self
 	var t = Timer.new()
 	t.set_wait_time(1)
