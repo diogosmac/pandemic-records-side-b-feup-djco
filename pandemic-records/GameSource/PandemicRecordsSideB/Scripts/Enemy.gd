@@ -49,8 +49,8 @@ func missileHit():
 	$hitSound.play()
 	
 	Global.score += Score
-	
 	Global.hudScore.set_text(str(Global.score))
+	onDeath()
 	
 	# wait a second for the sound to play then destroy self
 	var t = Timer.new()
@@ -62,7 +62,9 @@ func missileHit():
 
 	self.queue_free()
 
+func onDeath():
+	# "abstract" to be implemented by types of enemies in which it makes sense
+	pass
 
 func onScreenExit():
-	
 	self.queue_free()

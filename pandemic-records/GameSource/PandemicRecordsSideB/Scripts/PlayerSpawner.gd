@@ -25,6 +25,7 @@ func startGame():
 
 func spawnPlayer(isRespawn):
 	player = PlayerScene.instance()
+	player.position = Vector2(950, 950)
 	Global.player = player
 	player.playerSpawner = self
 	

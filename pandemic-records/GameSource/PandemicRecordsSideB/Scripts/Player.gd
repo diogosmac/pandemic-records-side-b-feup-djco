@@ -148,13 +148,10 @@ func _physics_process(delta):
 		
 		var collision = move_and_collide(moveDirection * Speed * delta)
 		if collision:
-			var character = collision.collider.get_node('character')
-#			if character == null:
-#				var monkey = 1
-#			elif character.is_visible():
-#				hitByEnemy(collision.collider)
-			if (character != null) and (character.is_visible()):
-				hitByEnemy(collision.collider)
+			if collision.collider.is_in_group('enemies'):
+				var character = collision.collider.get_node('character')
+				if (character != null) and (character.is_visible()):
+					hitByEnemy(collision.collider)
 	
 	if moveDirection.x == 0 && moveDirection.y == 0:
 		$player_anim/Anim_Walk.play("rest")
@@ -240,7 +237,6 @@ func refreshQuickFire():
 func onFiringTimerStopped():
 	# Set canFire back to true so the next round can be shot
 	canFire = true
-
 
 func hitByEnemy(enemy):
 	tookHitSound.play()
