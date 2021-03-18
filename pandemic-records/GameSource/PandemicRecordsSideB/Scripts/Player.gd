@@ -7,21 +7,33 @@ export(NodePath) var Barrel
 
 export(float) var MissileInterval = 0.3
 export(float) var ShotgunInterval = 1.0
-export(float) var PowerUpDuration = 10.0
+
+export(float) var QuickFireDuration = 5.0
 export(float) var QuickMissileInt = 0.15
 export(float) var QuickShotgunInt = 0.5
+export(float) var QuickFireCooldown = 5.0
+
+export(float) var NukeCooldown = 10.0
 
 export(int) var RespawnInterval = 1
 var respawnTimer
 
-var moveDirection
 var missileTimer
 var shotgunTimer
+
 var slowMissileTimer
 var slowShotgunTimer
+
 var quickMissileTimer
 var quickShotgunTimer
 var quickFireTimer
+var quickFireCooldown
+var quickFireOnCooldown = false
+
+var nukeCooldown
+var nukeOnCooldown = false
+
+var moveDirection
 var fireFrom
 
 var mousePosition
@@ -51,7 +63,11 @@ func _ready():
 	shotgunTimer = slowShotgunTimer
 	
 	respawnTimer = Global.oneShotTimer(RespawnInterval, self, self, "respawnPlayer")
-	quickFireTimer = Global.oneShotTimer(PowerUpDuration, self, self, "normalFire")
+
+	quickFireTimer = Global.oneShotTimer(QuickFireDuration, self, self, "normalFire")
+	quickFireCooldown = Global.oneShotTimer(QuickFireCooldown, self, self, "refreshQuickFire")
+	
+	nukeCooldown = Global.oneShotTimer(NukeCooldown, self, self, "refreshNuke")
 	
 	fireFrom = $player_anim/waist/weapon/fireFrom
 	
@@ -199,18 +215,27 @@ func shoot(bullet, angle):
 
 
 func nuke():
-	var treeRoot = get_tree().get_root()
-	for node in treeRoot.get_children():
-		print(node)
+	if not nukeOnCooldown:
+		get_tree().call_group("enemies", "missileHit")
+		nukeOnCooldown = true
+
+func refreshNuke():
+	nukeOnCooldown = false
 
 func quickFire():
-	missileTimer = quickMissileTimer
-	shotgunTimer = quickShotgunTimer
-	quickFireTimer.start()
+	if not quickFireOnCooldown:
+		missileTimer = quickMissileTimer
+		shotgunTimer = quickShotgunTimer
+		quickFireTimer.start()
+		quickFireOnCooldown = true
 
 func normalFire():
 	missileTimer = slowMissileTimer
 	shotgunTimer = slowShotgunTimer
+	quickFireCooldown.start()
+
+func refreshQuickFire():
+	quickFireOnCooldown = false
 
 func onFiringTimerStopped():
 	# Set canFire back to true so the next round can be shot
@@ -239,9 +264,6 @@ func hitByEnemy(enemy):
 
 
 func respawnPlayer():
-	
 	playerSpawner.spawnPlayer(true)
-	
 	canMove = true
-	
 	self.queue_free()
