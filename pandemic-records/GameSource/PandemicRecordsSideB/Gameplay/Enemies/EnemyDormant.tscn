@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=2]
 
-[ext_resource path="res://Scripts/EnemyDormant.gd" type="Script" id=1]
+[ext_resource path="res://Scripts/Enemies/EnemyDormant.gd" type="Script" id=1]
 [ext_resource path="res://Assets/slimule3.png" type="Texture" id=2]
 [ext_resource path="res://Assets/sounds/blip.wav" type="AudioStream" id=3]
 [ext_resource path="res://Assets/Particles/explosion_red.tscn" type="PackedScene" id=4]

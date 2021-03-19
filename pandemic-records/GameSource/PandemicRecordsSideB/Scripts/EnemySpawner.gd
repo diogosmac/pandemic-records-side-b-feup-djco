@@ -11,15 +11,15 @@ export(int) var increaseSpawnRateEvery = 10
 export(float) var increaseSpawnsBy = 1.1
 
 var EnemyScenes = [
-	"res://Gameplay/Enemies/EnemyStandard.tscn",
-	"res://Gameplay/Enemies/EnemyDormant.tscn",
-	"res://Gameplay/Enemies/EnemyBritish.tscn"
+	'res://Gameplay/Enemies/EnemyStandard.tscn',
+	'res://Gameplay/Enemies/EnemyDormant.tscn',
+	'res://Gameplay/Enemies/EnemyBritish.tscn'
 ]
 
 var EnemyVariants = [
-	"standard",
-	"dormant",
-	"british"
+	'standard',
+	'dormant',
+	'british'
 ]
 
 var enemiesToSpawn
@@ -34,7 +34,7 @@ var randomAngle
 
 var rng
 
-export(String, "up", "right", "down", "left", "any") var Direction = "down"
+export(String, 'up', 'right', 'down', 'left', 'any') var Direction = 'down'
 
 var spawnTimer
 var increaseSpawnRateTimer
@@ -54,6 +54,15 @@ func _on_PlayerSpawner_you_died():
 	clearEnemies()
 	Global.player = null
 
+func createPowerUp(powerUpScene, location):
+	print('spawning powerup at %s' % location)
+	var powerUp = powerUpScene.instance()
+	powerUp.position = location
+	call_deferred('spawnPowerUp', powerUp, location)
+
+func spawnPowerUp(powerUp, location):
+	powerUp.add_to_group('powerups')
+	get_parent().add_child(powerUp)
 
 func clearEnemies():
 	if get_child_count() > 0:
@@ -62,14 +71,14 @@ func clearEnemies():
 
 
 func startGame():
-	increaseSpawnRateTimer = Global.repeatingTimer(increaseSpawnRateEvery, self, self, "onIncreaseSpawnRate")
+	increaseSpawnRateTimer = Global.repeatingTimer(increaseSpawnRateEvery, self, self, 'onIncreaseSpawnRate')
 	increaseSpawnRateTimer.stop()
 	spawnEnemy()
 	increaseSpawnRateTimer.start()
 
 
 func spawnEnemy():
-	spawnTimer = Global.oneShotTimer(SpawnInterval, self, self, "onSpawnTimer")
+	spawnTimer = Global.oneShotTimer(SpawnInterval, self, self, 'onSpawnTimer')
 	spawnTimer.start()
 
 	rng.randomize()
@@ -82,26 +91,26 @@ func spawnEnemyType(type, direction):
 	enemyScene = EnemyScenes[type]
 
 	match direction:
-		"any":
+		'any':
 			randomMin = 0
 			randomMax = 360
-		"up":
+		'up':
 			randomMin = 180
 			randomMax = 360
-		"right":
+		'right':
 			randomMin = 270
 			randomMax = 450
-		"down":
+		'down':
 			randomMin = 0
 			randomMax = 180
-		"left":
+		'left':
 			randomMin = 90
 			randomMax = 270
 
 	enemy = enemyScene.instance()
 	enemy.variantType = EnemyVariants[type]
 	enemy.position = enemySpawnLocation
-	enemy.add_to_group("enemies")
+	enemy.add_to_group('enemies')
 
 	rng.randomize()
 	randomAngle = rng.randf_range(randomMin, randomMax)

@@ -18,4 +18,4 @@ func _physics_process(delta):
 		self.queue_free()
 
 func _on_Missile_body_entered(enemy):
-	enemy.missileHit()
+	enemy.missileHit(true)

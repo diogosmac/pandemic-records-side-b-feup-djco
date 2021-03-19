@@ -11,12 +11,11 @@ export(float) var ShotgunInterval = 1.0
 export(float) var QuickFireDuration = 5.0
 export(float) var QuickMissileInt = 0.15
 export(float) var QuickShotgunInt = 0.5
-export(float) var QuickFireCooldown = 5.0
-
-export(float) var NukeCooldown = 10.0
 
 export(int) var RespawnInterval = 1
 var respawnTimer
+
+var velocity
 
 var missileTimer
 var shotgunTimer
@@ -40,8 +39,7 @@ var mousePosition
 var aimPosition
 
 var canFire = true
-
-var missile
+var isAlive = true
 
 var playerSpawner
 
@@ -54,24 +52,20 @@ var tookHitSound
 func _ready():
 	moveDirection = Vector2(0, 0)
 	
-	slowMissileTimer = Global.oneShotTimer(MissileInterval, self, self, "onFiringTimerStopped")
-	slowShotgunTimer = Global.oneShotTimer(ShotgunInterval, self, self, "onFiringTimerStopped")
-	quickMissileTimer = Global.oneShotTimer(QuickMissileInt, self, self, "onFiringTimerStopped")
-	quickShotgunTimer = Global.oneShotTimer(QuickShotgunInt, self, self, "onFiringTimerStopped")
+	slowMissileTimer = Global.oneShotTimer(MissileInterval, self, self, 'onFiringTimerStopped')
+	slowShotgunTimer = Global.oneShotTimer(ShotgunInterval, self, self, 'onFiringTimerStopped')
+	quickMissileTimer = Global.oneShotTimer(QuickMissileInt, self, self, 'onFiringTimerStopped')
+	quickShotgunTimer = Global.oneShotTimer(QuickShotgunInt, self, self, 'onFiringTimerStopped')
 	
 	missileTimer = slowMissileTimer
 	shotgunTimer = slowShotgunTimer
+	quickFireTimer = Global.oneShotTimer(QuickFireDuration, self, self, 'normalFire')
 	
-	respawnTimer = Global.oneShotTimer(RespawnInterval, self, self, "respawnPlayer")
-
-	quickFireTimer = Global.oneShotTimer(QuickFireDuration, self, self, "normalFire")
-	quickFireCooldown = Global.oneShotTimer(QuickFireCooldown, self, self, "refreshQuickFire")
-	
-	nukeCooldown = Global.oneShotTimer(NukeCooldown, self, self, "refreshNuke")
+	respawnTimer = Global.oneShotTimer(RespawnInterval, self, self, 'respawnPlayer')
 	
 	fireFrom = $player_anim/waist/weapon/fireFrom
 	
-	$player_anim/Anim_Walk.play("walk")
+	$player_anim/Anim_Walk.play('walk')
 	
 	fireSound = $fireSound
 	tookHitSound = $tookHitSound
@@ -118,45 +112,49 @@ func _physics_process(delta):
 	
 	if canMove:
 		# Move and collide
-		if Input.is_action_pressed("left"):
+		if Input.is_action_pressed('left'):
 			moveDirection.x = -1
-		elif Input.is_action_pressed("right"):
+		elif Input.is_action_pressed('right'):
 			moveDirection.x = 1
 		else:
 			moveDirection.x = 0
-		if Input.is_action_pressed("up"):
+		if Input.is_action_pressed('up'):
 			moveDirection.y = -1
-		elif Input.is_action_pressed("down"):
+		elif Input.is_action_pressed('down'):
 			moveDirection.y = 1
 		else:
 			moveDirection.y = 0
 		
 		# Fire left weapon
-		if Input.is_action_pressed("left_fire"):
+		if Input.is_action_pressed('left_fire'):
 			leftFirePressed()
 			
 		# Fire right weapon
-		elif Input.is_action_pressed("right_fire"):
+		elif Input.is_action_pressed('right_fire'):
 			rightFirePressed()
 		
 		# drop nuke (test only)
-		if Input.is_action_pressed("nuke"):
+		if Input.is_action_pressed('nuke'):
 			nuke()
 		
-		if Input.is_action_pressed("quickfire"):
+		if Input.is_action_pressed('quickfire'):
 			quickFire()
 		
-		var collision = move_and_collide(moveDirection * Speed * delta)
+		velocity = moveDirection * Speed
+		var collision = move_and_collide(velocity * delta)
 		if collision:
+			velocity = velocity.slide(collision.normal)
 			if collision.collider.is_in_group('enemies'):
 				var character = collision.collider.get_node('character')
 				if (character != null) and (character.is_visible()):
 					hitByEnemy(collision.collider)
+			elif collision.collider.is_in_group('powerups'):
+				caughtPowerup(collision.collider)
 	
 	if moveDirection.x == 0 && moveDirection.y == 0:
-		$player_anim/Anim_Walk.play("rest")
-	elif (not $player_anim/Anim_Walk.get_current_animation() == "walk"):
-		$player_anim/Anim_Walk.play("walk")
+		$player_anim/Anim_Walk.play('rest')
+	elif (not $player_anim/Anim_Walk.get_current_animation() == 'walk'):
+		$player_anim/Anim_Walk.play('walk')
 
 
 func leftFirePressed():
@@ -207,32 +205,21 @@ func shootMissile():
 func shoot(bullet, angle):
 	bullet.position = fireFrom.get_global_position()
 	bullet.rotation = $aim.get_rotation() + angle
-	bullet.add_to_group("missiles")
+	bullet.add_to_group('missiles')
 	get_tree().get_root().add_child(bullet)
 
 
 func nuke():
-	if not nukeOnCooldown:
-		get_tree().call_group("enemies", "missileHit")
-		nukeOnCooldown = true
-
-func refreshNuke():
-	nukeOnCooldown = false
+	get_tree().call_group('enemies', 'missileHit', false)
 
 func quickFire():
-	if not quickFireOnCooldown:
-		missileTimer = quickMissileTimer
-		shotgunTimer = quickShotgunTimer
-		quickFireTimer.start()
-		quickFireOnCooldown = true
+	missileTimer = quickMissileTimer
+	shotgunTimer = quickShotgunTimer
+	quickFireTimer.start()
 
 func normalFire():
 	missileTimer = slowMissileTimer
 	shotgunTimer = slowShotgunTimer
-	quickFireCooldown.start()
-
-func refreshQuickFire():
-	quickFireOnCooldown = false
 
 func onFiringTimerStopped():
 	# Set canFire back to true so the next round can be shot
@@ -246,7 +233,7 @@ func hitByEnemy(enemy):
 	$explosion.set_emitting(true)
 	$player_anim.visible = false
 	
-	var playerCollision = get_node("CollisionShape2D")
+	var playerCollision = get_node('CollisionShape2D')
 	playerCollision.disabled = true
 	playerSpawner.PlayerLives -= 1
 	Global.hudLives.set_text(str(playerSpawner.PlayerLives))
@@ -263,3 +250,6 @@ func respawnPlayer():
 	playerSpawner.spawnPlayer(true)
 	canMove = true
 	self.queue_free()
+
+func caughtPowerup(powerUp):
+	powerUp.caught(self)

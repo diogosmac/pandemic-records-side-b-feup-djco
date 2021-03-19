@@ -32,18 +32,19 @@ func spawnPlayer(isRespawn):
 	add_child(player)
 	
 	if isRespawn:
-		invincibleTimer = Global.oneShotTimer(InvincibleTime, self, player, "onInvincibleTimerStopped")
+		invincibleTimer = Global.oneShotTimer(InvincibleTime, self, player, 'onInvincibleTimerStopped')
 		
-		playerCollision = player.get_node("CollisionShape2D")
+		playerCollision = player.get_node('CollisionShape2D')
 		playerCollision.disabled = true
 		
-		playerSprite = player.get_node("player_anim")
+		playerSprite = player.get_node('player_anim')
 		playerSprite.set_modulate(Color(1, 1, 1, 0.25))
 		
 		invincibleTimer.start()
 		
 		player.canMove = true
 		player.canFire = false
+		player.isAlive = false
 	else:
 		player.canMove = true
 
@@ -53,7 +54,7 @@ func playerDied():
 	emit_signal('you_died')
 
 func onInvincibleTimerStopped():
-	
 	playerCollision.disabled = false
 	player.canFire = true
+	player.isAlive = true
 	playerSprite.set_modulate(Color(1, 1, 1, 1))

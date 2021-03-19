@@ -11,5 +11,5 @@ func _physics_process(delta):
 	position += (angle * Speed) * delta
 
 func _on_Missile_body_entered(enemy):
-	enemy.missileHit()
+	enemy.missileHit(true)
 	self.queue_free()
