@@ -5,7 +5,6 @@
 [ext_resource path="res://Assets/sounds/blip.wav" type="AudioStream" id=3]
 [ext_resource path="res://Scripts/Enemies/Enemy.gd" type="Script" id=4]
 
-
 [sub_resource type="Animation" id=1]
 resource_name = "walk"
 length = 1.5
@@ -194,8 +193,7 @@ tracks/14/keys = {
 
 [node name="Enemy" type="KinematicBody2D"]
 position = Vector2( -1.37558, -63.8219 )
-collision_layer = 2
-collision_mask = 0
+collision_layer = 2147483650
 script = ExtResource( 4 )
 
 [node name="character" type="Node2D" parent="."]

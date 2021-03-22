@@ -2,25 +2,28 @@ extends YSort
 
 var SpawnInterval = 5
 
-export(float) var SpawnIntervalMin = 1.00
+export(float) var SpawnIntervalMin		 = 1.00
+export(float) var SpawnIntervalMax		 = 3.00
+export(int)   var IncreaseSpawnRateEvery = 10
+export(float) var IncreaseSpawnsBy		 = 1.1
 
-export(float) var SpawnIntervalMax = 3.00
+export(float) var StandardProb = 60
+export(float) var DormantProb  = 15
+export(float) var BritishProb  = 25
 
-export(int) var increaseSpawnRateEvery = 10
+var probs = {
+	'standard': StandardProb,
+	'dormant':	DormantProb,
+	'british':	BritishProb
+}
 
-export(float) var increaseSpawnsBy = 1.1
+var totalProb = StandardProb + DormantProb + BritishProb
 
-var EnemyScenes = [
-	'res://Gameplay/Enemies/EnemyStandard.tscn',
-	'res://Gameplay/Enemies/EnemyDormant.tscn',
-	'res://Gameplay/Enemies/EnemyBritish.tscn'
-]
-
-var EnemyVariants = [
-	'standard',
-	'dormant',
-	'british'
-]
+var EnemyScenes = {
+	'standard': 'res://Gameplay/Enemies/EnemyStandard.tscn',
+	'dormant':  'res://Gameplay/Enemies/EnemyDormant.tscn',
+	'british':  'res://Gameplay/Enemies/EnemyBritish.tscn'
+}
 
 var enemiesToSpawn
 
@@ -42,9 +45,8 @@ var increaseSpawnRateTimer
 
 func _ready():
 	rng = RandomNumberGenerator.new()
-	for i in range(0, EnemyScenes.size()):
-		EnemyScenes[i] = load(EnemyScenes[i])
-
+	for type in EnemyScenes:
+		EnemyScenes[type] = load(EnemyScenes[type])
 
 func _on_PlayButton_pressed():
 	startGame()
@@ -55,12 +57,12 @@ func _on_PlayerSpawner_you_died():
 	Global.player = null
 
 func createPowerUp(powerUpScene, location):
-	print('spawning powerup at %s' % location)
-	var powerUp = powerUpScene.instance()
-	powerUp.position = location
-	call_deferred('spawnPowerUp', powerUp, location)
+	if not get_tree().get_nodes_in_group('powerups'):
+		var powerUp = powerUpScene.instance()
+		powerUp.position = location
+		call_deferred('spawnPowerUp', powerUp)
 
-func spawnPowerUp(powerUp, location):
+func spawnPowerUp(powerUp):
 	powerUp.add_to_group('powerups')
 	get_parent().add_child(powerUp)
 
@@ -69,22 +71,32 @@ func clearEnemies():
 		for i in get_children():
 			i.queue_free()
 
-
 func startGame():
-	increaseSpawnRateTimer = Global.repeatingTimer(increaseSpawnRateEvery, self, self, 'onIncreaseSpawnRate')
+	increaseSpawnRateTimer = Global.repeatingTimer(IncreaseSpawnRateEvery, self, self, 'onIncreaseSpawnRate')
 	increaseSpawnRateTimer.stop()
 	spawnEnemy()
 	increaseSpawnRateTimer.start()
-
 
 func spawnEnemy():
 	spawnTimer = Global.oneShotTimer(SpawnInterval, self, self, 'onSpawnTimer')
 	spawnTimer.start()
 
 	rng.randomize()
-	var enemyType = rng.randi_range(0, EnemyScenes.size() - 1)
-	spawnEnemyType(enemyType, Direction)
+	var enemyType = rng.randi_range(1, totalProb)
+	for key in probs:
+		if enemyType <= probs[key]:
+			spawnEnemyType(key, Direction)
+			break
+		else:
+			enemyType -= probs[key]
 
+func getProb(keyword):
+	# could really use a sum() function, but no such thing in GDScript :(
+	var sum = 0
+	for key in probs:
+		if key != keyword: sum += probs[key]
+		else: break
+	return sum
 
 func spawnEnemyType(type, direction):
 	enemySpawnLocation = position
@@ -108,7 +120,7 @@ func spawnEnemyType(type, direction):
 			randomMax = 270
 
 	enemy = enemyScene.instance()
-	enemy.variantType = EnemyVariants[type]
+	enemy.variantType = type
 	enemy.position = enemySpawnLocation
 	enemy.add_to_group('enemies')
 
@@ -132,5 +144,5 @@ func onSpawnTimer():
 
 
 func onIncreaseSpawnRate():
-	SpawnIntervalMin /= increaseSpawnsBy
-	SpawnIntervalMax /= increaseSpawnsBy
+	SpawnIntervalMin /= IncreaseSpawnsBy
+	SpawnIntervalMax /= IncreaseSpawnsBy
