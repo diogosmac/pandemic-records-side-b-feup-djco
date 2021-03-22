@@ -35,7 +35,7 @@ func _physics_process(delta):
 		enemy_wall_collision = move_and_collide(direction * Speed * delta)
 
 
-func missileHit(bullet):
+func missileHit(bullet, score):
 	# only trigger on death effects if killed by bullet
 	if bullet:
 		onDeath()
@@ -51,8 +51,9 @@ func missileHit(bullet):
 	$hitSound.set_volume_db(randomVolume)
 	$hitSound.play()
 	
-	Global.score += Score
-	Global.hudScore.set_text(str(Global.score))
+	if score:
+		Global.score += Score
+		Global.hudScore.set_text(str(Global.score))
 	
 	# wait a second for the sound to play then destroy self
 	var t = Timer.new()

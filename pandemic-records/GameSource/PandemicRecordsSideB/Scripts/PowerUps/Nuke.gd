@@ -1,4 +1,4 @@
 extends 'res://Scripts/PowerUps/PowerUp.gd'
 
 func executePowerUp(player):
-	player.nuke()
+	player.nuke(true)

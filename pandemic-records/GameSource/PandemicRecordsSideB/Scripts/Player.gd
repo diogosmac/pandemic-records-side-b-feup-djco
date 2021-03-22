@@ -135,7 +135,7 @@ func _physics_process(delta):
 		
 		# drop nuke (test only)
 		if Input.is_action_pressed('nuke'):
-			nuke()
+			nuke(true)
 		
 		if Input.is_action_pressed('quickfire'):
 			quickFire()
@@ -209,8 +209,8 @@ func shoot(bullet, angle):
 	get_tree().get_root().add_child(bullet)
 
 
-func nuke():
-	get_tree().call_group('enemies', 'missileHit', false)
+func nuke(score):
+	get_tree().call_group('enemies', 'missileHit', false, score)
 
 func quickFire():
 	missileTimer = quickMissileTimer
@@ -236,6 +236,7 @@ func hitByEnemy(enemy):
 	var playerCollision = get_node('CollisionShape2D')
 	playerCollision.disabled = true
 	playerSpawner.PlayerLives -= 1
+	nuke(false)
 	Global.hudLives.set_text(str(playerSpawner.PlayerLives))
 	
 	if playerSpawner.PlayerLives > 0:
