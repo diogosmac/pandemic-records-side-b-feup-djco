@@ -36,3 +36,7 @@ func repeatingTimer(time, called_from_node, add_as_child_of, callback):
 func _process(_delta):
 	if Input.is_action_pressed('exit'):
 		get_tree().quit()
+
+func incrementScore(amount):
+	score += amount
+	hudScore.set_text(str(score))

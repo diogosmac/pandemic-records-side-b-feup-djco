@@ -52,8 +52,7 @@ func missileHit(bullet, score):
 	$hitSound.play()
 	
 	if score:
-		Global.score += Score
-		Global.hudScore.set_text(str(Global.score))
+		Global.incrementScore(Score)
 	
 	# wait a second for the sound to play then destroy self
 	var t = Timer.new()
