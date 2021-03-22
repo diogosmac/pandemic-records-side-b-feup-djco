@@ -133,13 +133,6 @@ func _physics_process(delta):
 		elif Input.is_action_pressed('right_fire'):
 			rightFirePressed()
 		
-		# drop nuke (test only)
-		if Input.is_action_pressed('nuke'):
-			nuke(true)
-		
-		if Input.is_action_pressed('quickfire'):
-			quickFire()
-		
 		velocity = moveDirection * Speed
 		var collision = move_and_collide(velocity * delta)
 		if collision:
