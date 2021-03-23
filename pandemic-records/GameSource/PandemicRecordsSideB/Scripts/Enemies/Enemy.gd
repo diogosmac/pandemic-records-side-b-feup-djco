@@ -27,8 +27,8 @@ func _ready():
 	Variant = variantIndexes[variantType]
 	Speed = variantSpeeds[Variant]
 	Score = variantScores[Variant]
-	if direction.y * Speed < 150:
-		direction.y = 150 / Speed
+	if direction.y * Speed < 300:
+		direction.y = 300 / Speed
 		direction = direction.normalized()
 
 func _physics_process(delta):
