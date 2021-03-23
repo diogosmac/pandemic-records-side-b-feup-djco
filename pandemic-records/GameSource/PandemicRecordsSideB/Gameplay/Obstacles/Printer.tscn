@@ -3,7 +3,7 @@
 [ext_resource path="res://Assets/Particles/explosion.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Scripts/Obstacles/Obstacle.gd" type="Script" id=2]
 [ext_resource path="res://Assets/sounds/crash.wav" type="AudioStream" id=3]
-[ext_resource path="res://Assets/Obstacle.png" type="Texture" id=4]
+[ext_resource path="res://Assets/printer.png" type="Texture" id=4]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 106.958, 107.255 )
@@ -17,7 +17,8 @@ script = ExtResource( 2 )
 shape = SubResource( 1 )
 
 [node name="Sprite" type="Sprite" parent="."]
-scale = Vector2( 0.35, 0.35 )
+position = Vector2( -13.1102, 10.1136 )
+scale = Vector2( 0.272049, 0.270317 )
 texture = ExtResource( 4 )
 
 [node name="crashSound" type="AudioStreamPlayer" parent="."]
