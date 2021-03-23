@@ -2,20 +2,23 @@ extends YSort
 
 export(PackedScene) var obstacleScene
 
-export(float) var FirstPrinter = 7.5
-export(float) var PrinterInterval = 15
+export(float) var FirstInterval = 7.9
+export(float) var PrinterInterval = 7.2
 
 var obstacle
 var obstacleSpawnLocation = position
 
 var initialSpawnTimer
-var spawnTimer
+var firstSpawnTimer
+var secondSpawnTimer
 
 func _ready():
 	initialSpawnTimer = Global.oneShotTimer(
-		FirstPrinter, self, self, 'beginSpawning')
-	spawnTimer = Global.repeatingTimer(
-		PrinterInterval, self, self, 'spawnObstacle')
+		FirstInterval, self, self, 'beginSpawning')
+	firstSpawnTimer = Global.oneShotTimer(
+		PrinterInterval, self, self, 'spawnFirst')
+	secondSpawnTimer = Global.repeatingTimer(
+		PrinterInterval * 2, self, self, 'spawnSecond')
 	obstacleSpawnLocation = position
 
 func _on_PlayButton_pressed():
@@ -27,7 +30,15 @@ func startGame():
 func beginSpawning():
 	initialSpawnTimer.queue_free()
 	spawnObstacle()
-	spawnTimer.start()
+	firstSpawnTimer.start()
+
+func spawnFirst():
+	spawnObstacle()
+	secondSpawnTimer.start()
+
+func spawnSecond():
+	spawnObstacle()
+	firstSpawnTimer.start()
 
 func spawnObstacle():
 	obstacle = obstacleScene.instance()
@@ -36,5 +47,6 @@ func spawnObstacle():
 	get_parent().add_child(obstacle)
 
 func _on_PlayerSpawner_you_died():
-	spawnTimer.stop()
+	firstSpawnTimer.queue_free()
+	secondSpawnTimer.queue_free()
 	self.queue_free()
