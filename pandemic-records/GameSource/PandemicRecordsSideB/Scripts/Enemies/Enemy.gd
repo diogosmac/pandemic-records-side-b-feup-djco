@@ -27,6 +27,9 @@ func _ready():
 	Variant = variantIndexes[variantType]
 	Speed = variantSpeeds[Variant]
 	Score = variantScores[Variant]
+	if direction.y * Speed < 150:
+		direction.y = 150 / Speed
+		direction = direction.normalized()
 
 func _physics_process(delta):
 	var collision = move_and_collide(direction * Speed * delta)
