@@ -1,11 +1,8 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Assets/quickfire.png" type="Texture" id=1]
 [ext_resource path="res://Scripts/PowerUps/QuickFire.gd" type="Script" id=2]
 [ext_resource path="res://Assets/sounds/quickFire.wav" type="AudioStream" id=3]
-
-[sub_resource type="CircleShape2D" id=1]
-radius = 30.8642
 
 [node name="QuickFire" type="KinematicBody2D"]
 collision_layer = 4
@@ -13,13 +10,11 @@ collision_mask = 0
 script = ExtResource( 2 )
 
 [node name="Sprite" type="Sprite" parent="."]
-scale = Vector2( 0.3, 0.3 )
+scale = Vector2( 0.15, 0.15 )
 texture = ExtResource( 1 )
-offset = Vector2( -0.5, -0.5 )
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2( -0.595276, 3.1748 )
-shape = SubResource( 1 )
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PoolVector2Array( 0, -38.5, 33.25, -19, 33.25, 19, 0, 38.5, -33.25, 19, -33.25, -19 )
 
 [node name="quickFireSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 3 )

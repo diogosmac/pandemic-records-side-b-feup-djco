@@ -112,6 +112,7 @@ func spawnEnemyType(type):
 	
 	rng.randomize()
 	randomAngle = rng.randf_range(30, 150)
+#	randomAngle = rng.randf_range(60, 120)
 	
 	if randomAngle >= 90 && randomAngle <= 270:
 		enemy.apply_scale(Vector2(-1,1))

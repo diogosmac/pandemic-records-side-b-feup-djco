@@ -15,7 +15,7 @@ func _physics_process(delta):
 	var _collision = move_and_collide(direction * Speed * delta)
 
 func caught(player):
-	$CollisionShape2D.set_deferred('disabled', true)
+	$CollisionPolygon2D.set_deferred('disabled', true)
 	$Sprite.set_visible(false)
 	
 	executePowerUp(player)
