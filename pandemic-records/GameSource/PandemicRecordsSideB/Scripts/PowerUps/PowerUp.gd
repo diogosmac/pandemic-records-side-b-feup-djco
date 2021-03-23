@@ -12,19 +12,25 @@ func _ready():
 	visibilityNotifier.connect('screen_exited', self, 'onScreenExit')
 
 func _physics_process(delta):
-	var collision = move_and_collide(direction * Speed * delta)
+	var _collision = move_and_collide(direction * Speed * delta)
 
 func caught(player):
 	$CollisionShape2D.set_deferred('disabled', true)
 	$Sprite.set_visible(false)
-#	randomize()
-#	var randomVolume = rand_range(-2, 0)
-#	$pickupSound.set_volume_db(randomVolume)
-#	$pickupSound.play()
+	
 	executePowerUp(player)
+	
+	# wait a second for the sound to play then destroy self
+	var t = Timer.new()
+	t.set_wait_time(1)
+	t.set_one_shot(true)
+	self.add_child(t)
+	t.start()
+	yield(t, 'timeout')
+	
 	self.queue_free()
 
-func executePowerUp(player):
+func executePowerUp(_player):
 	# 'abstract' method to be overridden by subclasses
 	pass
 

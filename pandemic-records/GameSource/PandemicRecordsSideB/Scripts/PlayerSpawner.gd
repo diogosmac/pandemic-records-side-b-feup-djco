@@ -17,6 +17,8 @@ var playerWeapon
 
 func _on_Play_Button_pressed():
 	PlayerLives = PlayerStartingLives
+	for obstacle in get_tree().get_nodes_in_group('obstacles'):
+		obstacle.queue_free()
 	startGame()
 
 func startGame():
@@ -34,8 +36,8 @@ func spawnPlayer(isRespawn):
 	if isRespawn:
 		invincibleTimer = Global.oneShotTimer(InvincibleTime, self, player, 'onInvincibleTimerStopped')
 		
-		playerCollision = player.get_node('CollisionShape2D')
-		playerCollision.disabled = true
+		player.set_collision_layer_bit(1, false)
+		player.set_collision_layer_bit(2, false)
 		
 		playerSprite = player.get_node('player_anim')
 		playerSprite.set_modulate(Color(1, 1, 1, 0.25))
@@ -54,7 +56,8 @@ func playerDied():
 	emit_signal('you_died')
 
 func onInvincibleTimerStopped():
-	playerCollision.disabled = false
+	player.set_collision_layer_bit(1, true)
+	player.set_collision_layer_bit(2, true)
 	player.canFire = true
 	player.isAlive = true
 	playerSprite.set_modulate(Color(1, 1, 1, 1))

@@ -137,12 +137,15 @@ func _physics_process(delta):
 		var collision = move_and_collide(velocity * delta)
 		if collision:
 			velocity = velocity.slide(collision.normal)
-			if collision.collider.is_in_group('enemies'):
-				var character = collision.collider.get_node('character')
+			var collider = collision.collider
+			if collider.is_in_group('enemies'):
+				var character = collider.get_node('character')
 				if (character != null) and (character.is_visible()):
-					hitByEnemy(collision.collider)
-			elif collision.collider.is_in_group('powerups'):
-				caughtPowerup(collision.collider)
+					hitByEnemy(collider)
+			elif collider.is_in_group('powerups'):
+				caughtPowerup(collider)
+			elif collider.is_in_group('obstacles'):
+				hitByObstacle(collider)
 	
 	if moveDirection.x == 0 && moveDirection.y == 0:
 		$player_anim/Anim_Walk.play('rest')
@@ -156,7 +159,6 @@ func leftFirePressed():
 func rightFirePressed():
 	firePressed(true)
 
-
 func firePressed(shotgun):
 	if canFire:
 		fireMissile(shotgun)
@@ -165,7 +167,6 @@ func firePressed(shotgun):
 		timer.start()
 		# Turn off the ability to fire until the firing interval time runs out
 		canFire = false
-
 
 func fireMissile(shotgun):
 	# slight variation of volume so it doesn't get too rhythmic
@@ -184,23 +185,19 @@ func fireMissile(shotgun):
 	else:
 		shootMissile()
 
-
 func shootShotgun():
 	# 70 degrees cone in aim direction
 	for angle in [-35, -17.5, 0, 17.5, 35]:
 		shoot(ShotgunBlastScene.instance(), deg2rad(angle))
 
-
 func shootMissile():
 	shoot(MissileScene.instance(), 0)
-
 
 func shoot(bullet, angle):
 	bullet.position = fireFrom.get_global_position()
 	bullet.rotation = $aim.get_rotation() + angle
 	bullet.add_to_group('missiles')
 	get_tree().get_root().add_child(bullet)
-
 
 func nuke(score):
 	get_tree().call_group('enemies', 'missileHit', false, score)
@@ -219,10 +216,17 @@ func onFiringTimerStopped():
 	canFire = true
 
 func hitByEnemy(enemy):
-	tookHitSound.play()
-	canMove = false
 	enemy.queue_free()
-	
+	literallyDie()
+
+func hitByObstacle(obstacle):
+	obstacle.blowUp()
+	literallyDie()
+
+func literallyDie():
+#	tookHitSound.play()
+	canMove = false
+
 	$explosion.set_emitting(true)
 	$player_anim.visible = false
 	

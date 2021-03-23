@@ -29,27 +29,29 @@ func _ready():
 	Score = variantScores[Variant]
 
 func _physics_process(delta):
-	var enemy_wall_collision = move_and_collide(direction * Speed * delta)
-	if enemy_wall_collision:
+	var collision = move_and_collide(direction * Speed * delta)
+	if collision:
+		if collision.collider.is_in_group('obstacles'):
+			missileHit(false, false)
 		direction.x = -direction.x
-		enemy_wall_collision = move_and_collide(direction * Speed * delta)
+		collision = move_and_collide(direction * Speed * delta)
 
 
 func missileHit(bullet, score):
 	# only trigger on death effects if killed by bullet
 	if bullet:
+		# slightly vary the volume of the sound played when missile hits enemy
+		randomize()
+		var randomVolume = rand_range(-2, 0)
+		$hitSound.set_volume_db(randomVolume)
+		$hitSound.play()
+		
 		onDeath()
-
+	
 	$CollisionPolygon2D.set_deferred('disabled', true)
 	$character.set_visible(false)
 	
-	# slightly vary the volume of the sound played when missile hits enemy
-	randomize()
-	var randomVolume = rand_range(-2, 0)
-	
 	$explosion.set_emitting(true)
-	$hitSound.set_volume_db(randomVolume)
-	$hitSound.play()
 	
 	if score:
 		Global.incrementScore(Score)
