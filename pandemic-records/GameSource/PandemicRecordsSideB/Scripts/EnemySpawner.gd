@@ -70,6 +70,8 @@ func startGame():
 	increaseSpawnRateTimer = Global.repeatingTimer(
 		IncreaseSpawnRateEvery, self, self, 'onIncreaseSpawnRate')
 	increaseSpawnRateTimer.stop()
+	SpawnIntervalMin = 1.00
+	SpawnIntervalMax = 3.00
 	spawnEnemy()
 	increaseSpawnRateTimer.start()
 

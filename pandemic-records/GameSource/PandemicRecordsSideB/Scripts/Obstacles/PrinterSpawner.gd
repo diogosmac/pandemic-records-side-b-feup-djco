@@ -22,11 +22,9 @@ func _on_PlayButton_pressed():
 	startGame()
 
 func startGame():
-	print('Starting timer')
 	initialSpawnTimer.start()
 
 func beginSpawning():
-	print('Starting spawns')
 	initialSpawnTimer.queue_free()
 	spawnObstacle()
 	spawnTimer.start()

@@ -10,27 +10,24 @@ export var scrolling: bool = true
 
 # Local variable to keep track of the offset of the texture.
 var progress: Vector2 = Vector2.ZERO
+onready var init_pos = rect_position
+onready var scroll_dist = 0.75 * rect_size.y
 
 func _process(delta):
-	
 	if texture == null or !scrolling: return
 	
-	var texture_size = texture.get_size()
-	
-	# Add movement.
+	# add movement
 	rect_position += scroll_velocity * delta
 	progress += scroll_velocity * delta
 	
-	# Check if we moved over the size of a tile.
-	while abs(progress.x) >= texture_size.x:
-		progress.x -= texture_size.x * sign(scroll_velocity.x)
-		rect_position.x -= texture_size.x * sign(scroll_velocity.x)
-	
-	while abs(progress.y) >= texture_size.y:
-		progress.y -= texture_size.y * sign(scroll_velocity.y)
-		rect_position.y -= texture_size.y * sign(scroll_velocity.y)
+	# check if we moved over the entire map
+	while abs(progress.y) >= scroll_dist:
+		progress.y -= scroll_dist * sign(scroll_velocity.y)
+		rect_position.y -= scroll_dist * sign(scroll_velocity.y)
 
 func _on_PlayButton_pressed():
+	progress.y = 0
+	rect_position = init_pos
 	scroll_velocity.y = 150
 
 func _on_PlayerSpawner_you_died():
