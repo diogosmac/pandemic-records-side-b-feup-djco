@@ -2,6 +2,11 @@ extends KinematicBody2D
 
 export(float) var Speed = 150
 
+export(float) var lowerX
+export(float) var lowerY
+export(float) var upperX
+export(float) var upperY
+
 var startPosition
 
 var visibilityNotifier
@@ -10,7 +15,7 @@ var direction = Vector2(0, 1)
 func _ready():
 	startPosition = position
 	visibilityNotifier = VisibilityNotifier2D.new()
-	visibilityNotifier.set_rect(Rect2(-100, -100, 200, 200))
+	visibilityNotifier.set_rect(Rect2(lowerX, lowerY, upperX, upperY))
 	add_child(visibilityNotifier)
 	visibilityNotifier.connect('screen_exited', self, 'onScreenExit')
 

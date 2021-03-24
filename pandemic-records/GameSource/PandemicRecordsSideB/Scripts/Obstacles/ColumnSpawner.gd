@@ -2,8 +2,8 @@ extends YSort
 
 export(PackedScene) var obstacleScene
 
-export(float) var FirstColumn = 10
-export(float) var ColumnInterval = 7.5
+export(float) var FirstColumn = 5
+export(float) var ColumnInterval = 12
 
 var obstacle
 var obstacleSpawnLocation = position
