@@ -216,6 +216,7 @@ func onFiringTimerStopped():
 	canFire = true
 
 func hitByEnemy(enemy):
+	tookHitSound.play()
 	enemy.queue_free()
 	literallyDie()
 
@@ -224,7 +225,6 @@ func hitByObstacle(obstacle):
 	literallyDie()
 
 func literallyDie():
-	tookHitSound.play()
 	canMove = false
 	
 	$explosion.set_emitting(true)
