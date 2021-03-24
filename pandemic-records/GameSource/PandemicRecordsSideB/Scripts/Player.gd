@@ -224,9 +224,9 @@ func hitByObstacle(obstacle):
 	literallyDie()
 
 func literallyDie():
-#	tookHitSound.play()
+	tookHitSound.play()
 	canMove = false
-
+	
 	$explosion.set_emitting(true)
 	$player_anim.visible = false
 	
@@ -237,6 +237,7 @@ func literallyDie():
 	Global.hudLives.set_text(str(playerSpawner.PlayerLives))
 	
 	if playerSpawner.PlayerLives > 0:
+		Global.playerLimbo = true
 		respawnTimer.start()
 	else:
 		for missile in get_tree().get_nodes_in_group('missiles'):

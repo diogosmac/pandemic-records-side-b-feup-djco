@@ -8,6 +8,7 @@ var hudScore
 var hudLives
 
 var player
+var playerLimbo = true
 
 func _ready():
 	root = get_tree().get_root()

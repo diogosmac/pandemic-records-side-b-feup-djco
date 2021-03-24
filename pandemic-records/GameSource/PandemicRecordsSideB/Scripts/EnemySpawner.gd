@@ -79,6 +79,9 @@ func spawnEnemy():
 	spawnTimer = Global.oneShotTimer(SpawnInterval, self, self, 'onSpawnTimer')
 	spawnTimer.start()
 	
+	# stop spawning while player not alive
+	if Global.playerLimbo: return
+	
 	# skips a spawn if the spawner is obstructed
 	for obj in get_tree().get_nodes_in_group('obstacles'):
 		if overlaps_body(obj):

@@ -48,6 +48,7 @@ func spawnPlayer(isRespawn):
 		player.canFire = false
 		player.isAlive = false
 	else:
+		Global.playerLimbo = false
 		player.canMove = true
 
 
@@ -56,6 +57,7 @@ func playerDied():
 	emit_signal('you_died')
 
 func onInvincibleTimerStopped():
+	Global.playerLimbo = false
 	player.set_collision_layer_bit(1, true)
 	player.set_collision_layer_bit(2, true)
 	player.canFire = true

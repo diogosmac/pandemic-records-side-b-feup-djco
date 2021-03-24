@@ -16,6 +16,8 @@ var Variant
 var Speed
 var Score
 
+var limbo = false
+
 var visibilityNotifier
 
 
@@ -41,6 +43,9 @@ func _physics_process(delta):
 
 
 func missileHit(bullet, score):
+	# don't run if enemy only still exists to play sound
+	if limbo: return
+	
 	# only trigger on death effects if killed by bullet
 	if bullet:
 		# slightly vary the volume of the sound played when missile hits enemy
@@ -60,6 +65,7 @@ func missileHit(bullet, score):
 		Global.incrementScore(Score)
 	
 	# wait a second for the sound to play then destroy self
+	limbo = true
 	var t = Timer.new()
 	t.set_wait_time(1)
 	t.set_one_shot(true)
