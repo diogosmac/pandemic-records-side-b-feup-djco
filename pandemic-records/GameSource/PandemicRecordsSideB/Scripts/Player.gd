@@ -252,3 +252,6 @@ func respawnPlayer():
 
 func caughtPowerup(powerUp):
 	powerUp.caught(self)
+	
+func missileHit(test, test2):
+	literallyDie()

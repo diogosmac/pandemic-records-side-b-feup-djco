@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://Scripts/Player.gd" type="Script" id=1]
 [ext_resource path="res://Gameplay/MissileBlaster.tscn" type="PackedScene" id=2]
@@ -7,27 +7,46 @@
 [ext_resource path="res://Assets/sounds/deathSizzle.wav" type="AudioStream" id=5]
 [ext_resource path="res://Gameplay/MissileShotgun.tscn" type="PackedScene" id=6]
 [ext_resource path="res://Assets/Particles/explosion.tscn" type="PackedScene" id=7]
+[ext_resource path="res://Assets/spraygun.png" type="Texture" id=8]
+[ext_resource path="res://Assets/player/guard.png" type="Texture" id=9]
 [ext_resource path="res://Assets/playershadow.png" type="Texture" id=10]
 
 [sub_resource type="CapsuleShape2D" id=1]
-radius = 24.4805
-height = 77.556
+radius = 39.5897
+height = 0.0
 
 [node name="Player" type="KinematicBody2D"]
+position = Vector2( 0, -0.471924 )
 collision_mask = 14
 script = ExtResource( 1 )
 MissileScene = ExtResource( 2 )
 ShotgunBlastScene = ExtResource( 6 )
 
 [node name="player_anim" parent="." instance=ExtResource( 3 )]
+position = Vector2( 14.3941, 17.4617 )
 scale = Vector2( 1, 1 )
 
 [node name="r_arm" parent="player_anim" index="0"]
-position = Vector2( -19.3847, -36.4685 )
+position = Vector2( -40.3971, -6.2516 )
 rotation = 2.96943
+scale = Vector2( 0.2, 0.2 )
+
+[node name="waist" parent="player_anim" index="1"]
+position = Vector2( -35.3953, 19.9224 )
+
+[node name="torso" parent="player_anim/waist" index="0"]
+position = Vector2( -1.34711, -19.8586 )
+scale = Vector2( 0.2, 0.2 )
+z_index = 1
+texture = ExtResource( 9 )
+
+[node name="head" parent="player_anim/waist/torso" index="0"]
+texture = null
 
 [node name="l_arm" parent="player_anim/waist/torso" index="1"]
-rotation = 0.165786
+position = Vector2( 15.6064, -21.5191 )
+rotation = -1.35787
+texture = null
 
 [node name="end" parent="player_anim/waist/torso/l_arm" index="0"]
 rotation = -0.158027
@@ -40,21 +59,44 @@ rotation = -3.54946
 
 [node name="l_leg" parent="player_anim/waist" index="1"]
 position = Vector2( 3.28562, -0.670525 )
+rotation = -0.341267
+texture = null
+
+[node name="end" parent="player_anim/waist/l_leg" index="0"]
+rotation = 0.339168
 
 [node name="r_leg" parent="player_anim/waist" index="2"]
 position = Vector2( -8.30589, 0.128899 )
+rotation = 0.40593
+texture = null
+
+[node name="end" parent="player_anim/waist/r_leg" index="0"]
+position = Vector2( -1.79, 38.172 )
+rotation = -0.430842
+
+[node name="weapon" parent="player_anim/waist" index="3"]
+position = Vector2( 35.5785, -36.0021 )
+rotation = 1.5708
+scale = Vector2( 0.246382, 0.215851 )
+texture = ExtResource( 8 )
+centered = false
+offset = Vector2( -400, -200 )
+
+[node name="fireFrom" parent="player_anim/waist/weapon" index="0"]
+position = Vector2( -306.208, -4.70612 )
 
 [node name="playershadow" type="Sprite" parent="player_anim"]
 position = Vector2( 1.42326, 35.5609 )
 texture = ExtResource( 10 )
 
 [node name="aim" type="RayCast2D" parent="."]
+position = Vector2( 14.6306, 18.0271 )
 enabled = true
-cast_to = Vector2( 70, 0 )
+cast_to = Vector2( 0, -70 )
 collide_with_bodies = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2( 0.702698, -11.1442 )
+position = Vector2( -20.6613, 16.6063 )
 shape = SubResource( 1 )
 
 [node name="fireSound" type="AudioStreamPlayer" parent="."]
