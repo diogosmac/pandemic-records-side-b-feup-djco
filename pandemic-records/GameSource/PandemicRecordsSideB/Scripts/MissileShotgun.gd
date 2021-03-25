@@ -10,7 +10,7 @@ var initPosition
 
 func _ready():
 	initPosition = position
-	angle = Vector2( cos(rotation), sin(rotation) )
+	angle = Vector2(cos(rotation), sin(rotation))
 
 func _physics_process(delta):
 	position += (angle * Speed) * delta

@@ -26,12 +26,7 @@ ShotgunBlastScene = ExtResource( 6 )
 position = Vector2( 14.3941, 17.4617 )
 scale = Vector2( 1, 1 )
 
-[node name="r_arm" parent="player_anim" index="0"]
-position = Vector2( -40.3971, -6.2516 )
-rotation = 2.96943
-scale = Vector2( 0.2, 0.2 )
-
-[node name="waist" parent="player_anim" index="1"]
+[node name="waist" parent="player_anim" index="0"]
 position = Vector2( -35.3953, 19.9224 )
 
 [node name="torso" parent="player_anim/waist" index="0"]
@@ -40,41 +35,7 @@ scale = Vector2( 0.2, 0.2 )
 z_index = 1
 texture = ExtResource( 9 )
 
-[node name="head" parent="player_anim/waist/torso" index="0"]
-texture = null
-
-[node name="l_arm" parent="player_anim/waist/torso" index="1"]
-position = Vector2( 15.6064, -21.5191 )
-rotation = -1.35787
-texture = null
-
-[node name="end" parent="player_anim/waist/torso/l_arm" index="0"]
-rotation = -0.158027
-
-[node name="Remote_r_arm" parent="player_anim/waist/torso" index="2"]
-rotation = 2.96943
-
-[node name="end" parent="player_anim/waist/torso/Remote_r_arm" index="0"]
-rotation = -3.54946
-
-[node name="l_leg" parent="player_anim/waist" index="1"]
-position = Vector2( 3.28562, -0.670525 )
-rotation = -0.341267
-texture = null
-
-[node name="end" parent="player_anim/waist/l_leg" index="0"]
-rotation = 0.339168
-
-[node name="r_leg" parent="player_anim/waist" index="2"]
-position = Vector2( -8.30589, 0.128899 )
-rotation = 0.40593
-texture = null
-
-[node name="end" parent="player_anim/waist/r_leg" index="0"]
-position = Vector2( -1.79, 38.172 )
-rotation = -0.430842
-
-[node name="weapon" parent="player_anim/waist" index="3"]
+[node name="weapon" parent="player_anim/waist" index="1"]
 position = Vector2( 35.5785, -36.0021 )
 rotation = 1.5708
 scale = Vector2( 0.246382, 0.215851 )

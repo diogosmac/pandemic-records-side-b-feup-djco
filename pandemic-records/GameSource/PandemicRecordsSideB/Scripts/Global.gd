@@ -18,9 +18,9 @@ func oneShotTimer(time, called_from_node, add_as_child_of, callback):
 	timer.set_one_shot(true)
 	timer.connect('timeout', called_from_node, callback)
 	timer.set_wait_time(time)
-	# Add as child of a specified node, e.g. a missile
-	# That way if the parent node we're setting here is destroyed the timer will go with it, 
-	# e.g. when a missile times out
+	# add as child of a specified node, e.g. a missile
+	# that way if the parent node we're setting here is destroyed,
+	# the timer will go with it, (e.g. when a missile times out)
 	add_as_child_of.add_child(timer)
 	
 	return timer

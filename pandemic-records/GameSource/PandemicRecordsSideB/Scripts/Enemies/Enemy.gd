@@ -41,7 +41,6 @@ func _physics_process(delta):
 		direction.x = -direction.x
 		collision = move_and_collide(direction * Speed * delta)
 
-
 func missileHit(bullet, score):
 	# don't run if enemy only still exists to play sound
 	if limbo: return

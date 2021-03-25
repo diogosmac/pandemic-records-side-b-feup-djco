@@ -70,18 +70,15 @@ func _ready():
 	fireSound = $fireSound
 	tookHitSound = $tookHitSound
 
-
 func _physics_process(delta):
-	# This code takes the angle the mouse is aiming at and converts it to a 
-	# number that can represent a time in the player animation to jump to in
-	# order to make the little dude look like he's pointing the rifle in the
-	# right direction
+	# takes the angle the mouse is aiming at, and converts it to a number
+	# that can represent a time in the player animation to jump to, in
+	# order to make the player's gun point in the right direction
 	
 	# 0 is aiming to the right
 	# 90 is aiming straight down - 0.0
 	# 180 is aiming to the left - 0.3 in animation
-	# 270 is aiming straight up - 0.6
-	
+	# 270 is aiming straight up - 0.6	
 	var rotation_degrees = fposmod($aim.rotation_degrees, 360)
 	
 	var animation_time_range = 1.2
@@ -93,14 +90,13 @@ func _physics_process(delta):
 	
 	aimPosition = to_global($aim.position)
 	
-	# Using separate left and right animations so can clip the whole player to face one direction or the other
-	# If you flip within the animation you have to avoid tweening between facing right and left as though the
-	# little dude were being spun in place.
-	
-	# aiming left
+	# separate animations for player facing left and right, as it's more
+	# practical than flipping within the animation, where we'd have to
+	# avoid tweening between facing different directions
+	# # aiming left
 	if mousePosition.x < aimPosition.x:
 		$player_anim/Anim_Aim.set_current_animation('aiming_left')
-	# aiming right
+	# # aiming right
 	else:
 		$player_anim/Anim_Aim.set_current_animation('aiming_right')
 	
@@ -152,7 +148,6 @@ func _physics_process(delta):
 	elif (not $player_anim/Anim_Walk.get_current_animation() == 'walk'):
 		$player_anim/Anim_Walk.play('walk')
 
-
 func leftFirePressed():
 	firePressed(false)
 
@@ -162,10 +157,10 @@ func rightFirePressed():
 func firePressed(shotgun):
 	if canFire:
 		fireMissile(shotgun)
+		# firing timeout depends on the weapon fire (shotgun has a longer cooldown)
 		var timer = shotgunTimer if shotgun else missileTimer
-		# Start the firing timer
+		# start the firing timer
 		timer.start()
-		# Turn off the ability to fire until the firing interval time runs out
 		canFire = false
 
 func fireMissile(shotgun):
@@ -226,7 +221,7 @@ func hitByObstacle(obstacle):
 
 func literallyDie():
 	canMove = false
-	
+
 	$explosion.set_emitting(true)
 	$player_anim.visible = false
 	
@@ -243,7 +238,6 @@ func literallyDie():
 		for missile in get_tree().get_nodes_in_group('missiles'):
 			missile.queue_free()
 		playerSpawner.playerDied()
-
 
 func respawnPlayer():
 	playerSpawner.spawnPlayer(true)

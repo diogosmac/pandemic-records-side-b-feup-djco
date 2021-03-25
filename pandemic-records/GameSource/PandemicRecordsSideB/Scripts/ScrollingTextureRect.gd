@@ -1,14 +1,11 @@
 class_name ScrollingTextureRect
 extends TextureRect
 
-# Scroll velocity:
-# Velocity at which the texture scrolls. In pixels/second.
+# velocity at which the texture scrolls (pixels/second)
 export var scroll_velocity: Vector2 = Vector2.ZERO
-# Scrolling:
-# Weather or not the texture scrolls.
 export var scrolling: bool = true
 
-# Local variable to keep track of the offset of the texture.
+# tracks offset of the texture
 var progress: Vector2 = Vector2.ZERO
 onready var init_pos = rect_position
 onready var scroll_dist = 0.75 * rect_size.y

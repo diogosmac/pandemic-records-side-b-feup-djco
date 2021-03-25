@@ -47,6 +47,7 @@ func spawnPlayer(isRespawn):
 		player.canMove = true
 		player.canFire = false
 		player.isAlive = false
+		
 	else:
 		Global.playerLimbo = false
 		player.canMove = true
