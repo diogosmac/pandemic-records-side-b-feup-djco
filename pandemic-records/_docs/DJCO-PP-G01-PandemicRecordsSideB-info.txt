@@ -1,0 +1,7 @@
+The .zip files, as well as all of the other files for the delivery (just to make sure) are stored in the following link:
+	
+	tinyurl.com/djco-g01-preliminary-project
+
+It leads to a publicly shared Google Drive folder.
+
+To play the game, simply enter the folder related to the operating system you're on, and run the executable!

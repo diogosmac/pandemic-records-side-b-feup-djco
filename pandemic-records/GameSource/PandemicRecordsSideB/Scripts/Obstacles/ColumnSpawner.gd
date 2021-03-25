@@ -12,16 +12,16 @@ var initialSpawnTimer
 var spawnTimer
 
 func _ready():
-	initialSpawnTimer = Global.oneShotTimer(
-		FirstColumn, self, self, 'beginSpawning')
-	spawnTimer = Global.repeatingTimer(
-		ColumnInterval, self, self, 'spawnObstacle')
 	obstacleSpawnLocation = position
 
 func _on_PlayButton_pressed():
 	startGame()
 
 func startGame():
+	initialSpawnTimer = Global.oneShotTimer(
+		FirstColumn, self, self, 'beginSpawning')
+	spawnTimer = Global.repeatingTimer(
+		ColumnInterval, self, self, 'spawnObstacle')
 	initialSpawnTimer.start()
 
 func beginSpawning():
@@ -36,5 +36,4 @@ func spawnObstacle():
 	get_parent().add_child(obstacle)
 
 func _on_PlayerSpawner_you_died():
-	spawnTimer.stop()
-	self.queue_free()
+	spawnTimer.queue_free()
